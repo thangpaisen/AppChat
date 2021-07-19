@@ -12,7 +12,7 @@ const RoomItem = ({item}) => {
                   <Text style={styles.nameText}>{item.name}</Text>
                 </View>
                 <Text style={styles.contentText} numberOfLines={1}>
-                    <Text style={{color:'blue'}}>{item.latestMessage.displayName}: </Text>
+                    <Text style={{color:'blue'}}>{item.latestMessage.name ||'Hệ Thống'}: </Text>
                    {item.latestMessage.text.slice(0, 90)}
                    {/* {item.latestMessage.createdAt} */}
                 </Text>

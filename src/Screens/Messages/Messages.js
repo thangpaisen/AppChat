@@ -30,7 +30,7 @@ const Messages = ({route}) => {
     .onSnapshot(querySnapshot => {
       const messages = querySnapshot.docs.map(doc => {
         const firebaseData = doc.data()
-        // console.log(firebaseData);
+        console.log(firebaseData);
         const data = {
           _id: doc.id,
           text: '',
@@ -41,7 +41,7 @@ const Messages = ({route}) => {
         if (!firebaseData.system) {
           data.user = {
             ...firebaseData.user,
-            name: firebaseData.user.displayName
+            name: firebaseData.user.name
           }
         }
 
@@ -49,6 +49,7 @@ const Messages = ({route}) => {
       })
 
       setMessages(messages)
+      console.log(messages)
     })
 
   return () => unsubscribeListener()
@@ -64,7 +65,7 @@ const Messages = ({route}) => {
         createdAt: new Date().getTime(),
         user: {
           _id: user.uid,
-          displayName: user.displayName,
+          name: user.displayName,
         },
       });
     await firestore()
@@ -73,7 +74,7 @@ const Messages = ({route}) => {
       .set(
         {
           latestMessage: {
-            displayName: user.displayName,
+            name: user.displayName,
             text,
             createdAt: new Date().getTime(),
           },
