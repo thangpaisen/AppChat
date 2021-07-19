@@ -11,9 +11,16 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import logoImage from '../assets/image/dollars_logo.png';
+import auth from '@react-native-firebase/auth';
+import loading2 from '../assets/image/loading2.gif'
+import {useDispatch,useSelector} from 'react-redux'
+import {loginUser} from '../redux/actions/user'
+
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [text, onChangeText] = useState('');
+  const dispatch = useDispatch();
+  const loading = useSelector(state => state.user.loading)
   return (
     <View style={styles.container}>
       <Image style={styles.logoImage} source={logoImage} />
@@ -27,14 +34,22 @@ const LoginScreen = () => {
           value={text}
         />
       </View>
-      <TouchableOpacity 
+      <TouchableOpacity
+        disabled={loading?true:false}
         style={styles.buttonLogin}
         onPress={()=>{
             if(text.trim()!=='')
-                navigation.navigate('HomeScreen')
+            {
+                dispatch(loginUser(text));
+                // navigation.navigate('HomeScreen')
+            }
+                
         }}
         >
-        <Text style={{fontSize: 16, color: 'white',textAlign:'center'}}>ENTER</Text>
+        {
+        !loading?<Text style={{fontSize: 16, color: 'white',textAlign:'center'}}>ENTER</Text>
+        :<Image source={loading2} style={styles.imgBtnLoading}/>
+        }
       </TouchableOpacity>
     </View>
   );
@@ -72,10 +87,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonLogin:{
+      justifyContent:'center',
+      alignItems:'center',
       width:WIDTH_IMAGE,
+      height:40,
       padding:8,
       borderWidth:2,
       borderColor:'white',
       borderRadius:10,
   },
+  imgBtnLoading:{
+      width:32,
+      height: 32,
+      resizeMode:'stretch'
+  }
 });
