@@ -19,18 +19,26 @@ export const setUser = data => {
 };
 
 export const loginUser = (name) => async dispatch => {
-  console.log(name);
+  // console.log(name);
   try {
     dispatch(loginUserLoading());
     auth()
       .signInAnonymously()
-      
       .then(() => {
-        dispatch(loginUserSuccess());
+        console.log('au2');
         auth().currentUser.updateProfile({
           displayName: name,
-        });
-      });
+        })
+          dispatch(loginUserSuccess());
+        // return;
+      })
+      // .then(() => {
+      //     console.log('au3');
+      //     const user = auth().currentUser;
+      //     console.log(user);
+      //     dispatch(setUser(user));
+          dispatch(loginUserSuccess());
+      //   })
   } catch (e) {
     switch (e.code) {
       case 'auth/operation-not-allowed':

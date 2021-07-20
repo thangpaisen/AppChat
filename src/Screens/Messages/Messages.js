@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {GiftedChat,Bubble} from 'react-native-gifted-chat';
+import {GiftedChat,Bubble,Send,SystemMessage} from 'react-native-gifted-chat';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   StyleSheet,
@@ -20,6 +20,7 @@ const Messages = ({route}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [messages, setMessages] = useState([]);
+  const [typing, setTyping] = useState(false);
 //   console.log(messages);
   useEffect(() => {
   const unsubscribeListener = firestore()
@@ -44,7 +45,6 @@ const Messages = ({route}) => {
             name: firebaseData.user.name
           }
         }
-
         return data
       })
 
@@ -83,7 +83,8 @@ const Messages = ({route}) => {
       );
   }
   const renderBubble= (props) =>{
-    if((typeof props.previousMessage.user )!=='undefined'){
+    // console.log(props.user._id);
+    if((typeof props.previousMessage.user )!=='undefined' || props.currentMessage.user._id===user.uid){
       if (props.currentMessage.user._id === props.previousMessage.user._id) {
         return (
           <Bubble
@@ -94,20 +95,44 @@ const Messages = ({route}) => {
     }
     return (
       <View>
-        <Text style={styles.name}>{props.currentMessage.user.name}</Text>
+        <Text style={{fontSize:12,color: '#999',left:10,}}>{props.currentMessage.user.name}</Text>
         <Bubble
           {...props}
         />
       </View>
     );
-    }
-  return (
+  }
+  const renderSend= (props) =>{
+        return (
+            <Send
+                {...props}
+            >
+                <View style={{marginRight: 10, marginBottom: 8}}>
+                    <Icon name="send" size={24} color="#09bff2" />
+                </View>
+            </Send>
+        );
+  }
+  const renderSystemMessage = props => {
+    return (
+      <SystemMessage
+        {...props}
+        containerStyle={{
+          marginBottom: 15,
+        }}
+        textStyle={{
+          fontSize: 14,
+        }}
+      />
+    )
+  }
+
+return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable
           style={styles.back}
           onPress={() => {
-            // dispatch(logoutUser());
             navigation.navigate('ChatRoom');
           }}>
           <Icon name="arrow-back-outline" size={24} color="white" />
@@ -125,11 +150,18 @@ const Messages = ({route}) => {
       <GiftedChat
         // infiniteScroll={true}
         // loadEarlier={true}
-      // showUserAvatar={true}
+        // showUserAvatar={true}
         // renderUsernameOnMessage={true}
+        // renderAvatarOnTop={true}
+        scrollToBottom //hiện cái button cuộn xuống dưới cùng
+        // scrollToBottomComponent 
+        renderSend={renderSend} //tùy chỉnh cái nút send
+        // onInputTextChanged={}   //khi InputText thay đổi thì làm j
+        isTyping={true}  // ...
+        renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
         messages={messages}
         onSend={handleSend}
-        renderBubble={renderBubble}
+        renderBubble={renderBubble} 
         user={{
           _id: user.uid
         }}

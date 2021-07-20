@@ -12,7 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {logoutUser} from '../../redux/actions/user';
 const Header = () => {
-      const navigation = useNavigation();
+  const navigation = useNavigation();
   const dispatch = useDispatch();
     return (
         <View style={styles.header}>
@@ -24,15 +24,18 @@ const Header = () => {
         </Pressable>
         <View style={styles.headerTitle}>
           <Text style={styles.textHeader}>
-            ChatRoom
+            Clan Dollars
           </Text>
         </View>
-        <Pressable
+        {/* <Pressable
           onPress={() => {
             dispatch(logoutUser());
           }}>
           <Icon name="log-out-outline" size={24} color="white" />
-        </Pressable>
+        </Pressable> */}
+        <View>
+          <Icon name="log-out-outline" size={24} color="transparent" />
+        </View>
       </View>
       
     )

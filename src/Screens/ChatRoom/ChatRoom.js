@@ -1,5 +1,4 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {GiftedChat} from 'react-native-gifted-chat';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   StyleSheet,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import {useDispatch, useSelector} from 'react-redux';
@@ -16,12 +16,18 @@ import {logoutUser} from '../../redux/actions/user';
 import firestore from '@react-native-firebase/firestore'
 import Header from './Header'
 import RoomItem from './RoomItem'
+import NetworkError from '../NetworkError'
 const ChatRoom = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [threads, setThreads] = useState([])
   const [loading, setLoading] = useState(true)
-
+  const [netStatus, setNetStatus] = useState(true);
+  useEffect(() => {
+      NetInfo.addEventListener(state => {
+        setNetStatus(state.isConnected);
+      });
+    });
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('MESSAGE_THREADS')
@@ -48,7 +54,9 @@ const ChatRoom = () => {
   return (
     <View style={styles.container}>
       <Header/>
-      <FlatList
+      {
+      !netStatus?<NetworkError/>
+      :<FlatList
         showsVerticalScrollIndicator={false}
         data={threads}
         keyExtractor={item => item._id}
@@ -59,6 +67,7 @@ const ChatRoom = () => {
         )}
         ItemSeparatorComponent={() =>  <View style={styles.separator} />}
       />
+      }
     </View>
   );
 };

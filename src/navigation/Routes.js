@@ -7,22 +7,24 @@ import AppStack from './AppStack'
 import {useDispatch,useSelector} from 'react-redux'
 import {setUser} from '../redux/actions/user'
 
+
 const Routes = () => {
     const dispatch = useDispatch()
     const [initializing, setInitializing] = useState(true)
     const dataUser = useSelector(state => state.user.data)
-    // const [user, setUser] = useState(null)
-    // console.log('dataUser',dataUser);
+  // //   // console.log('dataUser',dataUser);
   // Handle user state changes
-  function onAuthStateChanged(result) {
+  const  onAuthStateChanged=(result)=> {
     // setUser(result)
+    console.log('route')
+    console.log(result)
     dispatch(setUser(result))
     if (initializing) setInitializing(false)
   }
-
   useEffect(() => {
+    // console.log('');
+    //  auth().onAuthStateChanged(onAuthStateChanged)
     const authSubscriber = auth().onAuthStateChanged(onAuthStateChanged)
-
     // unsubscribe on unmount
     return authSubscriber
   }, [])

@@ -9,8 +9,10 @@ import {
   TouchableOpacity,
   TextInput
 } from 'react-native';
+import NetInfo from "@react-native-community/netinfo";
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore'
+import NetworkError from '../NetworkError'
 const imageRoom =[
   'https://avatarfiles.alphacoders.com/194/thumb-194775.png',
   'https://avatarfiles.alphacoders.com/893/thumb-89303.gif',
@@ -40,6 +42,12 @@ const  getRandomImg=()=> {
 export default function CreateChatRoom() {
   const navigation = useNavigation();
   const [roomName, setRoomName] = useState('');
+  const [netStatus, setNetStatus] = useState(true);
+  useEffect(() => {
+      NetInfo.addEventListener(state => {
+        setNetStatus(state.isConnected);
+      });
+    });
   const handleButtonPress=() =>{
     if (roomName.length > 0) {
       // create new thread using firebase & firestore
@@ -77,12 +85,14 @@ export default function CreateChatRoom() {
         </Pressable>
         <View style={styles.headerTitle}>
           <Text style={styles.textHeader}>
-            CreateChatRoom
+            Tạo phòng chat
           </Text>
         </View>
         <View style={[styles.back, {backgroundColor: 'transparent'}]}></View>
       </View>
-      <View style={styles.main}>
+      {
+        !netStatus?<NetworkError/>
+      :<View style={styles.main}>
         <TextInput
           style={styles.textInput}
           placeholder="Thread Name"
@@ -92,6 +102,7 @@ export default function CreateChatRoom() {
           <Text style={styles.buttonText}>Create chat room</Text>
         </TouchableOpacity>
       </View>
+      }
     </View>
   );
 }
