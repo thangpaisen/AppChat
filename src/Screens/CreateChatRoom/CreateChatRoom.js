@@ -11,6 +11,32 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore'
+const imageRoom =[
+  'https://avatarfiles.alphacoders.com/194/thumb-194775.png',
+  'https://avatarfiles.alphacoders.com/893/thumb-89303.gif',
+  'https://avatarfiles.alphacoders.com/822/thumb-82242.png',
+  'https://avatarfiles.alphacoders.com/873/thumb-87367.png',
+  'https://avatarfiles.alphacoders.com/967/thumb-96757.png',
+  'https://avatarfiles.alphacoders.com/457/thumb-45744.png',
+  'https://avatarfiles.alphacoders.com/907/thumb-90762.png',
+  'https://avatarfiles.alphacoders.com/108/thumb-108672.gif',
+  'https://avatarfiles.alphacoders.com/989/thumb-98988.png',
+  'https://avatarfiles.alphacoders.com/872/thumb-87272.png',
+  'https://avatarfiles.alphacoders.com/749/thumb-74977.png',
+  'https://avatarfiles.alphacoders.com/105/thumb-105876.png',
+  'https://avatarfiles.alphacoders.com/997/thumb-99715.gif',
+  'https://avatarfiles.alphacoders.com/993/thumb-99313.png',
+  'https://avatarfiles.alphacoders.com/729/thumb-72999.png',
+  'https://avatarfiles.alphacoders.com/108/thumb-108670.gif',
+  'https://avatarfiles.alphacoders.com/843/thumb-84392.png',
+  'https://avatarfiles.alphacoders.com/962/thumb-96289.gif',
+  'https://avatarfiles.alphacoders.com/108/thumb-108679.gif',
+  'https://avatarfiles.alphacoders.com/128/thumb-128135.gif',
+]
+const  getRandomImg=()=> {
+  const randomIndex=  Math.floor(Math.random() * imageRoom.length);
+  return imageRoom[randomIndex];
+}
 export default function CreateChatRoom() {
   const navigation = useNavigation();
   const [roomName, setRoomName] = useState('');
@@ -21,6 +47,7 @@ export default function CreateChatRoom() {
         .collection('MESSAGE_THREADS')
         .add({
           name: roomName,
+          imageRoom:getRandomImg(),
           latestMessage: {
             text: `${roomName} created. Welcome!`,
             createdAt: new Date().getTime()

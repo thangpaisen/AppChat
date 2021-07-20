@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {GiftedChat,Bubble} from 'react-native-gifted-chat';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   StyleSheet,
@@ -30,7 +30,7 @@ const Messages = ({route}) => {
     .onSnapshot(querySnapshot => {
       const messages = querySnapshot.docs.map(doc => {
         const firebaseData = doc.data()
-        console.log(firebaseData);
+        // console.log(firebaseData);
         const data = {
           _id: doc.id,
           text: '',
@@ -49,7 +49,7 @@ const Messages = ({route}) => {
       })
 
       setMessages(messages)
-      console.log(messages)
+      // console.log(messages)
     })
 
   return () => unsubscribeListener()
@@ -82,6 +82,25 @@ const Messages = ({route}) => {
         {merge: true},
       );
   }
+  const renderBubble= (props) =>{
+    if((typeof props.previousMessage.user )!=='undefined'){
+      if (props.currentMessage.user._id === props.previousMessage.user._id) {
+        return (
+          <Bubble
+            {...props}
+          />
+        );
+      }
+    }
+    return (
+      <View>
+        <Text style={styles.name}>{props.currentMessage.user.name}</Text>
+        <Bubble
+          {...props}
+        />
+      </View>
+    );
+    }
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -104,8 +123,13 @@ const Messages = ({route}) => {
         <View style={[styles.back, {backgroundColor: 'transparent'}]}></View>
       </View>
       <GiftedChat
+        // infiniteScroll={true}
+        // loadEarlier={true}
+      // showUserAvatar={true}
+        // renderUsernameOnMessage={true}
         messages={messages}
         onSend={handleSend}
+        renderBubble={renderBubble}
         user={{
           _id: user.uid
         }}

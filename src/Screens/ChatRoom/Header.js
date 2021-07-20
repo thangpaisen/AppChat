@@ -18,10 +18,9 @@ const Header = () => {
         <View style={styles.header}>
         <Pressable
           onPress={() => {
-            // dispatch(logoutUser());
-            navigation.navigate('CreateChatRoom');
+           navigation.openDrawer();
           }}>
-          <Icon name="add" size={28} color="black" />
+          <Icon name="menu-outline" size={28} color="white" />
         </Pressable>
         <View style={styles.headerTitle}>
           <Text style={styles.textHeader}>
@@ -32,7 +31,7 @@ const Header = () => {
           onPress={() => {
             dispatch(logoutUser());
           }}>
-          <Icon name="log-out-outline" size={24} color="black" />
+          <Icon name="log-out-outline" size={24} color="white" />
         </Pressable>
       </View>
       

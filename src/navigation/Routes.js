@@ -12,7 +12,7 @@ const Routes = () => {
     const [initializing, setInitializing] = useState(true)
     const dataUser = useSelector(state => state.user.data)
     // const [user, setUser] = useState(null)
-    console.log('dataUser',dataUser);
+    // console.log('dataUser',dataUser);
   // Handle user state changes
   function onAuthStateChanged(result) {
     // setUser(result)
