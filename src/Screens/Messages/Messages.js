@@ -1,5 +1,11 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {GiftedChat,Bubble,Send,SystemMessage} from 'react-native-gifted-chat';
+import {
+  GiftedChat,
+  Bubble,
+  Send,
+  SystemMessage,
+} from 'react-native-gifted-chat';
+import * as Types from '../../../code'
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   StyleSheet,
@@ -21,40 +27,40 @@ const Messages = ({route}) => {
   const dispatch = useDispatch();
   const [messages, setMessages] = useState([]);
   const [typing, setTyping] = useState(false);
-//   console.log(messages);
+  //   console.log(messages);
   useEffect(() => {
-  const unsubscribeListener = firestore()
-    .collection('MESSAGE_THREADS')
-    .doc(thread._id)
-    .collection('MESSAGES')
-    .orderBy('createdAt', 'desc')
-    .onSnapshot(querySnapshot => {
-      const messages = querySnapshot.docs.map(doc => {
-        const firebaseData = doc.data()
-        // console.log(firebaseData);
-        const data = {
-          _id: doc.id,
-          text: '',
-          createdAt: new Date().getTime(),
-          ...firebaseData
-        }
+    const unsubscribeListener = firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(thread._id)
+      .collection('MESSAGES')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(querySnapshot => {
+        const messages = querySnapshot.docs.map(doc => {
+          const firebaseData = doc.data();
+          // console.log(firebaseData);
+          const data = {
+            _id: doc.id,
+            text: '',
+            createdAt: new Date().getTime(),
+            ...firebaseData,
+          };
 
-        if (!firebaseData.system) {
-          data.user = {
-            ...firebaseData.user,
-            name: firebaseData.user.name
+          if (!firebaseData.system) {
+            data.user = {
+              ...firebaseData.user,
+              name: firebaseData.user.name,
+            };
           }
-        }
-        return data
-      })
+          return data;
+        });
 
-      setMessages(messages)
-      // console.log(messages)
-    })
+        setMessages(messages);
+        // console.log(messages)
+      });
 
-  return () => unsubscribeListener()
-}, [])
-  const  handleSend= async (messages = []) =>{
+    return () => unsubscribeListener();
+  }, []);
+  const handleSend = async (messages = []) => {
     const text = messages[0].text;
     firestore()
       .collection('MESSAGE_THREADS')
@@ -81,38 +87,41 @@ const Messages = ({route}) => {
         },
         {merge: true},
       );
-  }
-  const renderBubble= (props) =>{
+  };
+  const renderBubble = props => {
     // console.log(props.user._id);
-    if((typeof props.previousMessage.user )!=='undefined' ){
-      if (props.currentMessage.user._id === props.previousMessage.user._id || props.currentMessage.user._id===user.uid) {
-        return (
-          <Bubble
-            {...props}
-          />
-        );
+    if (typeof props.previousMessage.user !== 'undefined') {
+      if (
+        props.currentMessage.user._id === props.previousMessage.user._id ||
+        props.currentMessage.user._id === user.uid
+      ) {
+        return <Bubble {...props} />;
       }
     }
     return (
       <View>
-        <Text style={{fontSize:12,color: '#999',left:10,}}>{props.currentMessage.user.name}</Text>
-        <Bubble
-          {...props}
-        />
+        {props.currentMessage.user.name === Types.NAME_ADMIN ? (
+          <Text style={{fontSize: 12, color: 'red', left: 10}}>
+            {props.currentMessage.user.name}
+          </Text>
+        ) : (
+          <Text style={{fontSize: 12, color: '#999', left: 10}}>
+            {props.currentMessage.user.name}
+          </Text>
+        )}
+        <Bubble {...props} />
       </View>
     );
-  }
-  const renderSend= (props) =>{
-        return (
-            <Send
-                {...props}
-            >
-                <View style={{marginRight: 10, marginBottom: 8}}>
-                    <Icon name="send" size={24} color="#09bff2" />
-                </View>
-            </Send>
-        );
-  }
+  };
+  const renderSend = props => {
+    return (
+      <Send {...props}>
+        <View style={{marginRight: 10, marginBottom: 8}}>
+          <Icon name="send" size={24} color="#09bff2" />
+        </View>
+      </Send>
+    );
+  };
   const renderSystemMessage = props => {
     return (
       <SystemMessage
@@ -124,10 +133,10 @@ const Messages = ({route}) => {
           fontSize: 14,
         }}
       />
-    )
-  }
+    );
+  };
 
-return (
+  return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable
@@ -154,16 +163,16 @@ return (
         // renderUsernameOnMessage={true}
         // renderAvatarOnTop={true}
         scrollToBottom //hiện cái button cuộn xuống dưới cùng
-        // scrollToBottomComponent 
+        // scrollToBottomComponent
         renderSend={renderSend} //tùy chỉnh cái nút send
         // onInputTextChanged={}   //khi InputText thay đổi thì làm j
-        isTyping={true}  // ...
+        isTyping={true} // ...
         renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
         messages={messages}
         onSend={handleSend}
-        renderBubble={renderBubble} 
+        renderBubble={renderBubble}
         user={{
-          _id: user.uid
+          _id: user.uid,
         }}
       />
     </View>

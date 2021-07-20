@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, View, Image} from 'react-native';
+import * as Types from '../../../code'
 import {Avatar} from 'react-native-elements';
 import IMAGE from '../../assets/image/dollars_logo.png';
 const RoomItem = ({item}) => {
@@ -21,7 +22,7 @@ const RoomItem = ({item}) => {
           <Text style={styles.nameText}>{item.name}</Text>
         </View>
         <Text style={styles.contentText} numberOfLines={1}>
-          <Text style={{color: '#0c7feb'}}>
+          <Text style={item.latestMessage.name===Types.NAME_ADMIN? {color:'red'}:{color: '#0c7feb'}}>
             {item.latestMessage.name || 'Hệ Thống'}:{' '}
           </Text>
           {item.latestMessage.text.slice(0, 90)}
