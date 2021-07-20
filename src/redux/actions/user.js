@@ -51,7 +51,7 @@ export const logoutUser = () => async dispatch => {
 export const updateProfileUser = name => async dispatch => {
   console.log('PASSWORD_ADMIN',Types.PASSWORD_ADMIN);
   var nameNew ;
-  if(name.toUpperCase()==='ADMIN' || name.toUpperCase()==='AD' || name.toUpperCase()==='BOSS')
+  if(name.toUpperCase().includes('ADMIN')|| name.toUpperCase()==='ADMIN' || name.toUpperCase()==='AD' || name.toUpperCase()==='BOSS')
     nameNew= `${name}[Fake]`
   else
   {

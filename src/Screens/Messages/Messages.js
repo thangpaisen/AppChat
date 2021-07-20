@@ -84,8 +84,8 @@ const Messages = ({route}) => {
   }
   const renderBubble= (props) =>{
     // console.log(props.user._id);
-    if((typeof props.previousMessage.user )!=='undefined' || props.currentMessage.user._id===user.uid){
-      if (props.currentMessage.user._id === props.previousMessage.user._id) {
+    if((typeof props.previousMessage.user )!=='undefined' ){
+      if (props.currentMessage.user._id === props.previousMessage.user._id || props.currentMessage.user._id===user.uid) {
         return (
           <Bubble
             {...props}
