@@ -21,11 +21,6 @@ const user = (state =initialData,action)=>{
                 loading:false,
             }
         
-        // case 'LOGOUT_USER':
-
-        //     return {
-        //         ...state,
-        //     }
         default:
             return state;
         

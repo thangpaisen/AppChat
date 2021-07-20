@@ -14,7 +14,7 @@ import logoImage from '../assets/image/dollars_logo.png';
 import auth from '@react-native-firebase/auth';
 import loading2 from '../assets/image/loading2.gif'
 import {useDispatch,useSelector} from 'react-redux'
-import {loginUser} from '../redux/actions/user'
+import {loginUser,updateProfileUser} from '../redux/actions/user'
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -41,7 +41,6 @@ const LoginScreen = () => {
             if(text.trim()!=='')
             {
                 dispatch(loginUser(text));
-                // navigation.navigate('HomeScreen')
             }
                 
         }}

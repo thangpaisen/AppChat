@@ -31,7 +31,7 @@ const DrawerContent = props => {
               }}
               size={90}
             />
-              <Text style={styles.title}>{name}</Text>
+              <Text style={styles.title}> {name}</Text>
               <Text style={{fontSize: 16, color: 'gray'}}>
                 Chức vụ: Thủ lĩnh🦾
               </Text>
@@ -53,7 +53,9 @@ const DrawerContent = props => {
                 navigation.navigate('ChatRoom');
               }}
             />
-            <DrawerItem
+            {
+              name==='Admin'
+            &&<DrawerItem
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
 
               icon={({color, size}) => (
@@ -68,6 +70,7 @@ const DrawerContent = props => {
                 navigation.navigate('CreateChatRoom');
               }}
             />
+            }
             <DrawerItem
           icon={({color, size}) => (
             <Icon name="exit-outline" color={color} size={size} />
