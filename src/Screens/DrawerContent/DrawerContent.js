@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Dimensions,
 } from 'react-native';
+import * as Types from '../../../code'
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Ionicons';
 import imageBackgroundUser from '../../assets/image/dollars_logo.png';
@@ -54,7 +55,7 @@ const DrawerContent = props => {
               }}
             />
             {
-              name==='Admin'
+              name===Types.NAME_ADMIN
             &&<DrawerItem
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
 

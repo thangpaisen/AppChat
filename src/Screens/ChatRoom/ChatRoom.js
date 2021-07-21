@@ -41,9 +41,7 @@ const ChatRoom = () => {
             ...documentSnapshot.data()
           }
         })
-
         setThreads(threads);
-        // console.log(threads);
         if (loading) {
           setLoading(false)
         }

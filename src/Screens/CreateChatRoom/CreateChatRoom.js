@@ -42,6 +42,7 @@ const  getRandomImg=()=> {
 export default function CreateChatRoom() {
   const navigation = useNavigation();
   const [roomName, setRoomName] = useState('');
+  const [loadingCreateRoom, setLoadingCreateRoom] = useState(true)
   const [netStatus, setNetStatus] = useState(true);
   useEffect(() => {
       NetInfo.addEventListener(state => {
@@ -49,13 +50,16 @@ export default function CreateChatRoom() {
       });
     });
   const handleButtonPress=() =>{
-    if (roomName.length > 0) {
+    if (roomName.trim().length > 0) {
       // create new thread using firebase & firestore
-      firestore()
+      setLoadingCreateRoom(true)
+      try {
+        firestore()
         .collection('MESSAGE_THREADS')
         .add({
           name: roomName,
           imageRoom:getRandomImg(),
+          typing:false,
           latestMessage: {
             text: `${roomName} created. Welcome!`,
             createdAt: new Date().getTime()
@@ -68,7 +72,12 @@ export default function CreateChatRoom() {
             system: true
           })
           navigation.navigate('ChatRoom')
+          setLoadingCreateRoom(false)
         })
+      } catch (error) {
+          console.log(error);
+          setLoadingCreateRoom(false)
+      }
     }
   }
 
