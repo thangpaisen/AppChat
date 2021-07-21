@@ -14,6 +14,7 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
+import Header from './Header';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
@@ -23,8 +24,6 @@ import {logoutUser} from '../../redux/actions/user';
 const Messages = ({route}) => {
   const {thread} = route.params;
   const user = auth().currentUser.toJSON();
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   useEffect(() => {
@@ -54,13 +53,13 @@ const Messages = ({route}) => {
 
         setMessages(messages);
       });
-      const unsubscribeListener2 = firestore()
+    const unsubscribeListener2 = firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .onSnapshot(querySnapshot => {
         console.log(querySnapshot.data().typing);
         setIsTyping(querySnapshot.data().typing);
-        });
+      });
 
     return () => {
       unsubscribeListener();
@@ -94,15 +93,12 @@ const Messages = ({route}) => {
         },
         {merge: true},
       );
-    await firestore()
-        .collection('MESSAGE_THREADS')
-        .doc(thread._id)
-        .set(
-          {
-            typing: false,
-          },
-          {merge: true},
-        )
+    await firestore().collection('MESSAGE_THREADS').doc(thread._id).set(
+      {
+        typing: false,
+      },
+      {merge: true},
+    );
   };
   const renderBubble = props => {
     if (typeof props.previousMessage.user !== 'undefined') {
@@ -146,56 +142,42 @@ const Messages = ({route}) => {
         }}
         textStyle={{
           fontSize: 14,
+          color: 'gray'
         }}
       />
     );
   };
-  const onInputTextChanged = async (value) => {
-    if (value === '')
-      setIsTyping(false);
-    else
-       setIsTyping(true);
-    await firestore()
-        .collection('MESSAGE_THREADS')
-        .doc(thread._id)
-        .set(
-          {
-            typing: isTyping,
-          },
-          {merge: true},
-        )
-
-
+  const onInputTextChanged = async value => {
+    if (value === '') setIsTyping(false);
+    else setIsTyping(true);
+    await firestore().collection('MESSAGE_THREADS').doc(thread._id).set(
+      {
+        typing: isTyping,
+      },
+      {merge: true},
+    );
   };
+  const scrollToBottomComponent =(props) => {
+    console.log(props)
+      return (
+        <View style={styles.scrollToBottomContainer}>
+             <Icon name="caret-down-outline" size={24} color="black" />
+        </View>
+  );
+  }
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Pressable
-          style={styles.back}
-          onPress={() => {
-            navigation.navigate('ChatRoom');
-          }}>
-          <Icon name="arrow-back-outline" size={24} color="white" />
-        </Pressable>
-        <View style={styles.headerTitle}>
-          <Text
-            style={styles.textHeader}
-            numberOfLines={1}
-            ellipsizeMode="tail">
-            {thread.name}
-          </Text>
-        </View>
-        <View style={[styles.back, {backgroundColor: 'transparent'}]}></View>
-      </View>
+      <Header thread={thread}/>
       <GiftedChat
-        // infiniteScroll={true}
-        // loadEarlier={true}
+        listViewProps={{
+          showsVerticalScrollIndicator: false,
+        }}
         // showUserAvatar={true}
-        // renderUsernameOnMessage={true}
-        // renderAvatarOnTop={true}
+        // renderUsernameOnMessage={true} // hiện thị username ở dưới mỗi ti nhắn (0 cần có tùy chỉnh username ở renderBubble rồi)
+        // renderAvatarOnTop={true} // hiển thị avatar đầu tin nhắn mặc đỉnh ở cuối
         onInputTextChanged={onInputTextChanged} // Gọi lại khi văn bản đầu vào thay đổi
         scrollToBottom //hiện cái button cuộn xuống dưới cùng
-        // scrollToBottomComponent
+        scrollToBottomComponent={scrollToBottomComponent} //tinh chỉnh cái scrollToBottom
         renderSend={renderSend} //tùy chỉnh cái nút send
         // onInputTextChanged={}   //khi InputText thay đổi thì làm j
         isTyping={isTyping} // ...
@@ -216,27 +198,10 @@ export default Messages;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'pink',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 10,
-    // marginBottom: 20,
-    backgroundColor: '#09bff2',
-  },
-  back: {
-    width: 32,
-    height: 32,
-    backgroundColor: 'gray',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textHeader: {
-    marginLeft: 10,
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
+  scrollToBottomContainer:{
+    // backgroundColor: 'white',
+    // elevation:1,
   },
 });
