@@ -2,7 +2,6 @@ import React from 'react';
 import {StyleSheet, Text, View, Image} from 'react-native';
 import * as Types from '../../../code'
 import {Avatar} from 'react-native-elements';
-import IMAGE from '../../assets/image/dollars_logo.png';
 const RoomItem = ({item}) => {
   return (
     <View style={styles.container}>

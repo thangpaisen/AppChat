@@ -11,7 +11,7 @@ import {
   StatusBar
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import logoImage from '../assets/image/dollars_logo.png';
+import logoImage from '../assets/image/logo.jpg';
 import auth from '@react-native-firebase/auth';
 import loading2 from '../assets/image/loading2.gif'
 import {useDispatch,useSelector} from 'react-redux'

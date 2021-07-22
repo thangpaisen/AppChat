@@ -17,6 +17,7 @@ import firestore from '@react-native-firebase/firestore'
 import Header from './Header'
 import RoomItem from './RoomItem'
 import NetworkError from '../NetworkError'
+import {localNotificationSV} from '../../Notification/LocalNotificationSV'
 const ChatRoom = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();

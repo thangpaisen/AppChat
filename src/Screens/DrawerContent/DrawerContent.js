@@ -10,15 +10,16 @@ import {
 import * as Types from '../../../code'
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Ionicons';
-import imageBackgroundUser from '../../assets/image/dollars_logo.png';
-import imageBackgroundUser2 from '../../assets/image/image2.png';
+// import imageBackgroundUser from '../../assets/image/dollars_logo.png';
+// import imageBackgroundUser2 from '../../assets/image/image2.png';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch,useSelector} from 'react-redux';
 import {logoutUser} from '../../redux/actions/user';
 const DrawerContent = props => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const name = useSelector(state => state.user.data.displayName)
+  const user = useSelector(state => state.user.data);
+  console.log(user)
 //   console.log(name);
   return (
     <View style={styles.container}>
@@ -28,11 +29,11 @@ const DrawerContent = props => {
             <Avatar
               rounded
               source={{
-                uri: 'https://avatarfiles.alphacoders.com/124/thumb-124599.png',
+                uri: 'https://avatarfiles.alphacoders.com/890/thumb-89095.gif',
               }}
               size={90}
             />
-              <Text style={styles.title}> {name}</Text>
+              <Text style={styles.title}> {user.displayName}</Text>
               <Text style={{fontSize: 16, color: 'gray'}}>
                 Chức vụ: Thủ lĩnh🦾
               </Text>
@@ -55,7 +56,7 @@ const DrawerContent = props => {
               }}
             />
             {
-              name===Types.NAME_ADMIN
+              user.displayName ===Types.NAME_ADMIN
             &&<DrawerItem
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
 

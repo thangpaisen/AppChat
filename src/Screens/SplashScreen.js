@@ -1,6 +1,6 @@
 import React,{ useEffect, useState } from 'react'
 import { StyleSheet, Text, View,Image,StatusBar } from 'react-native'
-import Logo2 from '../assets/image/dollars_logo.png'
+import Logo2 from '../assets/image/logo.jpg'
 
 import * as Animatable from 'react-native-animatable';
 // import {useIsFocused} from '@react-navigation/native';
