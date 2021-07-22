@@ -15,6 +15,7 @@ import {
   View,
   Pressable,
   TouchableOpacity,
+  BackHandler
 } from 'react-native';
 import Header from './Header';
 import {useNavigation} from '@react-navigation/native';
@@ -29,6 +30,32 @@ const Messages = ({route}) => {
   const [text, setText] = useState('')
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const backAction = () => {
+      firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(thread._id)
+      .collection('MESSAGES')
+      .add(
+        {
+           text:`${user.displayName} đã rời khỏi nhóm!!!`,
+           system: true,
+            createdAt: new Date().getTime(),
+        },
+      );
+    firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(thread._id)
+      .set(
+        {
+          latestMessage: {
+            text:`${user.displayName} đã rời khỏi nhóm!!!`,
+            createdAt: new Date().getTime(),
+            name:'Hệ Thống'
+          },
+        },
+        {merge: true},
+      );
+    };
   useEffect(() => {
     const unsubscribeListener = firestore()
       .collection('MESSAGE_THREADS')
@@ -53,22 +80,21 @@ const Messages = ({route}) => {
           }
           return data;
         });
-
         setMessages(messages);
       });
     const unsubscribeListener2 = firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .onSnapshot(querySnapshot => {
-        console.log(querySnapshot.data().typing);
         setIsTyping(querySnapshot.data().typing);
       });
-
     return () => {
       unsubscribeListener();
       unsubscribeListener2();
+      backAction();
     };
   }, []);
+
   const handleSend = async (messages = []) => {
     const text = messages[0].text;
     firestore()
@@ -104,10 +130,12 @@ const Messages = ({route}) => {
     );
   };
   const renderBubble = props => {
-    if (typeof props.previousMessage.user !== 'undefined') {
+    if(props.currentMessage.user._id === user.uid){
+       return <Bubble {...props} />;
+    }
+    if (props.previousMessage.user) {
       if (
-        props.currentMessage.user._id === props.previousMessage.user._id ||
-        props.currentMessage.user._id === user.uid
+        props.currentMessage.user._id === props.previousMessage.user._id
       ) {
         return <Bubble {...props} />;
       }
@@ -115,11 +143,11 @@ const Messages = ({route}) => {
     return (
       <View>
         {props.currentMessage.user.name === Types.NAME_ADMIN ? (
-          <Text style={{fontSize: 12, color: 'red', left: 10}}>
+          <Text style={{fontSize: 12, color: 'red', left: 5}}>
             {props.currentMessage.user.name}
           </Text>
         ) : (
-          <Text style={{fontSize: 12, color: '#999', left: 10}}>
+          <Text style={{fontSize: 12, color: '#999', left: 5}}>
             {props.currentMessage.user.name}
           </Text>
         )}
@@ -130,7 +158,7 @@ const Messages = ({route}) => {
   const renderSend = props => {
     return (
       <Send {...props}>
-        <View style={{marginRight: 10, marginBottom: 14}}>
+        <View style={{marginRight: 10, marginBottom: 10}}>
           <Icon name="send" size={24} color="#09bff2" />
         </View>
       </Send>
@@ -151,17 +179,18 @@ const Messages = ({route}) => {
     );
   };
   const onInputTextChanged = async value => {
-    if (value === '') setIsTyping(false);
-    else setIsTyping(true);
+    let typingTmp;
+    if (value === '') typingTmp= false;
+    else typingTmp = true;
     await firestore().collection('MESSAGE_THREADS').doc(thread._id).set(
       {
-        typing: isTyping,
+        typing: typingTmp,
       },
       {merge: true},
     );
+    setIsTyping(typingTmp);
   };
   const scrollToBottomComponent =(props) => {
-    console.log(props)
       return (
         <View style={styles.scrollToBottomContainer}>
              <Icon name="caret-down-outline" size={24} color="black" />
@@ -173,7 +202,7 @@ const Messages = ({route}) => {
       <Composer
       {...props}
       textInputStyle={styles.composer}
-      placeholder='Nhập tin nhắn'
+      placeholder='Nhập tin nhắn...'
       //  onTextChanged={(text) => setText(text)}
       // text={text}
       // multiline={true} 
@@ -185,15 +214,19 @@ const Messages = ({route}) => {
       <Actions
         {...props}
         options={{
-          // ['Send Image']: handlePickImage,
+          ['Send Image']: () =>console.log('sendimag'),
         }}
+        // onSend={args => console.log('args')}
         icon={() => (
-          <View style={{marginTop:-4}}>
+          <View style={{marginTop:-2}}>
           <Icon name="document-attach-outline" size={24} color="black" />
           </View>
         )}
       />
     )
+  }
+  const renderMessageImage= (props) =>{
+    
   }
   return (
     <View style={styles.container}>
@@ -215,6 +248,7 @@ const Messages = ({route}) => {
         isTyping={isTyping} // ...
         renderComposer={renderComposer}   // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
         renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
+        renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh
         messages={messages}
         onSend={handleSend}
         renderBubble={renderBubble}
@@ -244,8 +278,8 @@ const styles = StyleSheet.create({
       // borderRadius:15,
       // borderColor:'#C0CCDA',
       // borderWidth:1,
-      marginTop:4,
-        marginBottom:4,
+      marginTop:2,
+      marginBottom:2,
       // paddingLeft: 10,
     },
 });

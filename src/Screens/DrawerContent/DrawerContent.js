@@ -19,8 +19,6 @@ const DrawerContent = props => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.data);
-  console.log(user)
-//   console.log(name);
   return (
     <View style={styles.container}>
       <DrawerContentScrollView contentContainerStyle={{paddingTop: 0}}>

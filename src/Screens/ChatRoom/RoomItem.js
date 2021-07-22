@@ -1,10 +1,11 @@
 import React from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, Text, View, Image,Pressable} from 'react-native';
 import * as Types from '../../../code'
 import {Avatar} from 'react-native-elements';
 const RoomItem = ({item}) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container}
+      >
       <View style={styles.imageRoom}>
         <Avatar
           size={60}

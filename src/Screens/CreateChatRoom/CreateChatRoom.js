@@ -62,7 +62,8 @@ export default function CreateChatRoom() {
           typing:false,
           latestMessage: {
             text: `${roomName} created. Welcome!`,
-            createdAt: new Date().getTime()
+            createdAt: new Date().getTime(),
+            name:'Hệ Thống'
           }
         })
         .then(docRef => {

@@ -18,12 +18,13 @@ import Header from './Header'
 import RoomItem from './RoomItem'
 import NetworkError from '../NetworkError'
 import {localNotificationSV} from '../../Notification/LocalNotificationSV'
+import ImagePicker from 'react-native-image-crop-picker';
 const ChatRoom = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [threads, setThreads] = useState([])
-  const [loading, setLoading] = useState(true)
   const [netStatus, setNetStatus] = useState(true);
+  const user = auth().currentUser.toJSON();
   useEffect(() => {
       NetInfo.addEventListener(state => {
         setNetStatus(state.isConnected);
@@ -43,13 +44,72 @@ const ChatRoom = () => {
           }
         })
         setThreads(threads);
-        if (loading) {
-          setLoading(false)
-        }
       })
 
-    return () => unsubscribe()
+    return () => {
+      unsubscribe();
+    }
   }, [])
+  const handleOnPressITem =(item) => {
+   firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(item._id)
+      .collection('MESSAGES')
+      .add(
+        {
+           text:`${user.displayName} đã vào nhóm!!!`,
+           system: true,
+          createdAt: new Date().getTime(),
+        },
+      );
+    firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(item._id)
+      .set(
+        {
+          latestMessage: {
+            text:`${user.displayName} đã vào nhóm!!!`,
+            createdAt: new Date().getTime(),
+            name:'Hệ Thống'
+          },
+        },
+        {merge: true},
+      );
+    navigation.navigate('Messages',{ thread: item })
+  }
+
+
+const takePhotoFromCamera = () => {
+    ImagePicker.openCamera({
+      compressImageMaxWidth: 300,
+      compressImageMaxHeight: 300,
+      cropping: false,
+      compressImageQuality: 0.7
+    }).then(image => {
+      console.log(image);
+    });
+    ImagePicker.clean().then(() => {
+  console.log('removed all tmp images from tmp directory');
+}).catch(e => {
+  alert(e);
+});
+  }
+const choosePhotoFromLibrary = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: false,
+      compressImageQuality: 0.7
+    }).then(image => {
+      console.log(image);
+    });
+    ImagePicker.clean().then(() => {
+  console.log('removed all tmp images from tmp directory');
+}).catch(e => {
+  alert(e);
+});
+  }
+
   return (
     <View style={styles.container}>
       <Header/>
@@ -60,13 +120,22 @@ const ChatRoom = () => {
         data={threads}
         keyExtractor={item => item._id}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('Messages',{ thread: item })}>
+          <TouchableOpacity onPress={() => handleOnPressITem(item)}>
             <RoomItem item={item}/>
           </TouchableOpacity>
         )}
         ItemSeparatorComponent={() =>  <View style={styles.separator} />}
       />
       }
+      <TouchableOpacity
+      styles={{padding:20,backgroundColor:'blue'}}
+      onPress={() =>{
+          console.log('Press');
+          choosePhotoFromLibrary();
+      }}
+      >
+      <Text>onClick</Text>
+      </TouchableOpacity>
     </View>
   );
 };

@@ -1,8 +1,8 @@
 import React from 'react'
-import { StyleSheet, Text, View,Pressable } from 'react-native'
+import { StyleSheet, Text, View,Pressable,BackHandler } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
-
+import firestore from '@react-native-firebase/firestore';
 const Header = ({thread}) => {
   const navigation = useNavigation();
     return (
@@ -10,7 +10,7 @@ const Header = ({thread}) => {
         <Pressable
           style={styles.back}
           onPress={() => {
-            navigation.navigate('ChatRoom');
+            navigation.navigate('ChatRoom')   
           }}>
           <Icon name="arrow-back-outline" size={24} color="white" />
         </Pressable>
