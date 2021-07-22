@@ -4,6 +4,8 @@ import {
   Bubble,
   Send,
   SystemMessage,
+  Composer,
+  Actions
 } from 'react-native-gifted-chat';
 import * as Types from '../../../code';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -24,6 +26,7 @@ import {logoutUser} from '../../redux/actions/user';
 const Messages = ({route}) => {
   const {thread} = route.params;
   const user = auth().currentUser.toJSON();
+  const [text, setText] = useState('')
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   useEffect(() => {
@@ -127,7 +130,7 @@ const Messages = ({route}) => {
   const renderSend = props => {
     return (
       <Send {...props}>
-        <View style={{marginRight: 10, marginBottom: 8}}>
+        <View style={{marginRight: 10, marginBottom: 14}}>
           <Icon name="send" size={24} color="#09bff2" />
         </View>
       </Send>
@@ -165,12 +168,40 @@ const Messages = ({route}) => {
         </View>
   );
   }
+  const renderComposer = (props)=>{
+      return(
+      <Composer
+      {...props}
+      textInputStyle={styles.composer}
+      placeholder='Nhập tin nhắn'
+      //  onTextChanged={(text) => setText(text)}
+      // text={text}
+      // multiline={true} 
+      ></Composer>
+    )
+  }
+   const  renderActions=(props) =>{
+    return (
+      <Actions
+        {...props}
+        options={{
+          // ['Send Image']: handlePickImage,
+        }}
+        icon={() => (
+          <View style={{marginTop:-4}}>
+          <Icon name="document-attach-outline" size={24} color="black" />
+          </View>
+        )}
+      />
+    )
+  }
   return (
     <View style={styles.container}>
       <Header thread={thread}/>
       <GiftedChat
         listViewProps={{
           showsVerticalScrollIndicator: false,
+          marginBottom:10,
         }}
         // showUserAvatar={true}
         // renderUsernameOnMessage={true} // hiện thị username ở dưới mỗi ti nhắn (0 cần có tùy chỉnh username ở renderBubble rồi)
@@ -179,8 +210,10 @@ const Messages = ({route}) => {
         scrollToBottom //hiện cái button cuộn xuống dưới cùng
         scrollToBottomComponent={scrollToBottomComponent} //tinh chỉnh cái scrollToBottom
         renderSend={renderSend} //tùy chỉnh cái nút send
+        renderActions={renderActions}  //Nút hành động tùy chỉnh ở bên trái của trình soạn tin nhắn
         // onInputTextChanged={}   //khi InputText thay đổi thì làm j
         isTyping={isTyping} // ...
+        renderComposer={renderComposer}   // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
         renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
         messages={messages}
         onSend={handleSend}
@@ -204,4 +237,15 @@ const styles = StyleSheet.create({
     // backgroundColor: 'white',
     // elevation:1,
   },
+  composer:{
+      backgroundColor:'white',
+      color:'black',
+      fontSize:16,
+      // borderRadius:15,
+      // borderColor:'#C0CCDA',
+      // borderWidth:1,
+      marginTop:4,
+        marginBottom:4,
+      // paddingLeft: 10,
+    },
 });

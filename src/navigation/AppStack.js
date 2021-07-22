@@ -25,6 +25,7 @@ const MenuDrawer = () => {
     <Drawer.Navigator 
       initialRouteName="ChatRoom" 
       drawerContent={props =><DrawerContent/>}
+      openByDefault
       >
       <Drawer.Screen name="ChatRoom" component={ChatRoom} />
       <Drawer.Screen name="CreateChatRoom" component={CreateChatRoom} />

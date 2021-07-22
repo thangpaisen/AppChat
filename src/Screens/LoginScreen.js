@@ -8,6 +8,7 @@ import {
   Dimensions,
   Image,
   TextInput,
+  StatusBar
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import logoImage from '../assets/image/dollars_logo.png';
@@ -23,6 +24,12 @@ const LoginScreen = () => {
   const loading = useSelector(state => state.user.loading)
   return (
     <View style={styles.container}>
+      <StatusBar 
+            backgroundColor="black"
+            barStyle="light-content"
+            translucent={true} 
+            // hidden={true}
+          />
       <Image style={styles.logoImage} source={logoImage} />
       <View style={styles.formInput}>
         <Text style={{fontSize: 16, color: 'white', paddingHorizontal: 10}}>
