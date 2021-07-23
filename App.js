@@ -15,7 +15,7 @@ const App = () => {
 
   const getToken = async () => {
     const token = await messaging().getToken();
-    console.log('.........................: ', token);
+    // console.log('.........................: ', token);
   };
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const App = () => {
     localNotificationSV.configure();
     localNotificationSV.createChannel();
     messaging().onMessage(async remoteMessage => {
-      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      // console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
       const data={
             title: remoteMessage.notification.title,
             body: remoteMessage.notification.body,
@@ -33,7 +33,7 @@ const App = () => {
     });
 
     messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log('onNotificationOpenedApp: ', JSON.stringify(remoteMessage));
+      // console.log('onNotificationOpenedApp: ', JSON.stringify(remoteMessage));
     });
 
     // khi app đang thoát mà ấn vào thông báo rồi bay vào app 
@@ -48,7 +48,7 @@ const App = () => {
         }
       });
       messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log('Message handled in the background!', remoteMessage);
+    // console.log('Message handled in the background!', remoteMessage);
   });
 
 

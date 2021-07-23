@@ -12,10 +12,10 @@ class LocalNotificationSV {
   configure = () => {
     PushNotification.configure({
       onRegister: function (token) {
-        console.log('[LocalNotificationService] onRegister:', token);
+        // console.log('[LocalNotificationService] onRegister:', token);
       },
       onNotification: function (notification) {
-        console.log('[LocalNotificationService] onNotification:', notification);
+        // console.log('[LocalNotificationService] onNotification:', notification);
       },
       // IOS ONLY (optional): default: all - Permissions to register.
       permissions: {
@@ -49,7 +49,10 @@ class LocalNotificationSV {
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) See `soundName` parameter of `localNotification` function
       },
-      created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+      created => 
+      {
+      console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+      }
     );
   };
 }

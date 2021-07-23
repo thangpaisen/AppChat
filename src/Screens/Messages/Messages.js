@@ -20,7 +20,9 @@ import {
 import Header from './Header';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
+import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
 import {logoutUser} from '../../redux/actions/user';
 
@@ -31,6 +33,7 @@ const Messages = ({route}) => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const backAction = () => {
+    console.log('out')
       firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
@@ -55,7 +58,7 @@ const Messages = ({route}) => {
         },
         {merge: true},
       );
-    };
+  };
   useEffect(() => {
     const unsubscribeListener = firestore()
       .collection('MESSAGE_THREADS')
@@ -91,7 +94,7 @@ const Messages = ({route}) => {
     return () => {
       unsubscribeListener();
       unsubscribeListener2();
-      backAction();
+      // backAction();
     };
   }, []);
 
@@ -117,6 +120,41 @@ const Messages = ({route}) => {
           latestMessage: {
             name: user.displayName,
             text,
+            image:'',
+            createdAt: new Date().getTime(),
+          },
+        },
+        {merge: true},
+      );
+    await firestore().collection('MESSAGE_THREADS').doc(thread._id).set(
+      {
+        typing: false,
+      },
+      {merge: true},
+    );
+  };
+  const handleSendImage = async (uri) => {
+    firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(thread._id)
+      .collection('MESSAGES')
+      .add({
+        image:uri,
+        createdAt: new Date().getTime(),
+        user: {
+          _id: user.uid,
+          name: user.displayName,
+        },
+      });
+    await firestore()
+      .collection('MESSAGE_THREADS')
+      .doc(thread._id)
+      .set(
+        {
+          latestMessage: {
+            name: user.displayName,
+            image:uri,
+            text:'',
             createdAt: new Date().getTime(),
           },
         },
@@ -195,7 +233,7 @@ const Messages = ({route}) => {
         <View style={styles.scrollToBottomContainer}>
              <Icon name="caret-down-outline" size={24} color="black" />
         </View>
-  );
+    );
   }
   const renderComposer = (props)=>{
       return(
@@ -209,25 +247,67 @@ const Messages = ({route}) => {
       ></Composer>
     )
   }
-   const  renderActions=(props) =>{
+  const openLibrary = () => {
+
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        // maxHeight: 200,
+        // maxWidth: 200,
+      },
+     response => {
+        if (!response.didCancel) {
+          const uri = response.assets[0].uri;
+          const fileName = response.assets[0].fileName;
+          upLoadedImageToFirebase(uri,fileName);
+        } else console.log('exit ');
+      },
+    );
+  }
+  const openCamera = () => {
+      launchCamera(
+        {
+          mediaType: 'photo',
+          includeBase64: false,
+          // maxHeight: 200,
+          // maxWidth: 200,
+        },
+        response => {
+        if (!response.didCancel) {
+            const uri = response.assets[0].uri;
+            const fileName = response.assets[0].fileName;
+            upLoadedImageToFirebase(uri,fileName);
+          } else console.log('exit ');
+        },
+      );
+  }
+  const  renderActions=(props) =>{
     return (
       <Actions
         {...props}
         options={{
-          ['Send Image']: () =>console.log('sendimag'),
+          ['Camera']: () =>openCamera(),
+          ['Library']: () =>openLibrary(),
         }}
         // onSend={args => console.log('args')}
         icon={() => (
           <View style={{marginTop:-2}}>
-          <Icon name="document-attach-outline" size={24} color="black" />
+          <Icon name="image-outline" size={24} color="black" />
           </View>
         )}
       />
     )
   }
   const renderMessageImage= (props) =>{
-    
   }
+  const upLoadedImageToFirebase = async (uri, fileName) => {
+      const reference = storage().ref(fileName);
+      await reference.putFile(uri);
+      const url = await storage().ref(fileName).getDownloadURL();
+      console.log(url);
+      handleSendImage(url);
+  };
   return (
     <View style={styles.container}>
       <Header thread={thread}/>
@@ -248,7 +328,8 @@ const Messages = ({route}) => {
         isTyping={isTyping} // ...
         renderComposer={renderComposer}   // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
         renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
-        renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh
+        // renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh
+        alwaysShowSend   //Luôn hiển thị nút gửi trong trình soạn văn bản đầu vào
         messages={messages}
         onSend={handleSend}
         renderBubble={renderBubble}
