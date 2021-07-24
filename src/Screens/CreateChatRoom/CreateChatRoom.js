@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TextInput
 } from 'react-native';
+import Header from './Header'
 import NetInfo from "@react-native-community/netinfo";
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore'
@@ -42,6 +43,7 @@ const  getRandomImg=()=> {
 export default function CreateChatRoom() {
   const navigation = useNavigation();
   const [roomName, setRoomName] = useState('');
+  const [messageErr, setMessageErr] = useState('fasdfafwdaf');
   const [loadingCreateRoom, setLoadingCreateRoom] = useState(true)
   const [netStatus, setNetStatus] = useState(true);
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function CreateChatRoom() {
       });
     });
   const handleButtonPress=() =>{
-    if (roomName.trim().length > 0) {
+    if (roomName.trim().length > 5) {
       // create new thread using firebase & firestore
       setLoadingCreateRoom(true)
       try {
@@ -80,36 +82,28 @@ export default function CreateChatRoom() {
           setLoadingCreateRoom(false)
       }
     }
+    else{
+      setMessageErr('Name Room must be at least 6 characters');
+    }
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Pressable
-          style={styles.back}
-          onPress={() => {
-            // dispatch(logoutUser());
-            navigation.navigate('ChatRoom');
-          }}>
-          <Icon name="arrow-back-outline" size={24} color="white" />
-        </Pressable>
-        <View style={styles.headerTitle}>
-          <Text style={styles.textHeader}>
-            Tạo phòng chat
-          </Text>
-        </View>
-        <View style={[styles.back, {backgroundColor: 'transparent'}]}></View>
-      </View>
+      <Header/>
       {
         !netStatus?<NetworkError/>
       :<View style={styles.main}>
         <TextInput
           style={styles.textInput}
-          placeholder="Thread Name"
-          onChangeText={roomName => setRoomName(roomName)}
+          placeholder="Nhập tên phòng..."
+          onChangeText={roomName => {
+            setRoomName(roomName);
+            setMessageErr('')
+          }}
         />
+         <Text style={{color: 'red',textAlign:'center',padding:6}}>{messageErr}</Text>
         <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
-          <Text style={styles.buttonText}>Create chat room</Text>
+          <Text style={styles.buttonText}>Tạo Phòng chat</Text>
         </TouchableOpacity>
       </View>
       }
@@ -118,36 +112,18 @@ export default function CreateChatRoom() {
 }
 
 const styles = StyleSheet.create({
-     container: {
+    container: {
     flex: 1,
+    backgroundColor: 'white'
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 10,
-    // marginBottom: 20,
-    backgroundColor: '#09bff2',
-  },
-  back: {
-    width: 32,
-    height: 32,
-    backgroundColor: 'gray',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textHeader: {
-    marginLeft: 10,
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-  },
+  
   main: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#dee2eb',
+    backgroundColor: 'white',
+    paddingHorizontal: 50,
+    alignItems: 'stretch',
   },
   title: {
     marginTop: 20,
@@ -158,26 +134,23 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#2196F3',
     textAlign: 'center',
-    alignSelf: 'center',
-    paddingHorizontal: 40,
     paddingVertical: 10,
     borderRadius: 5,
-    marginTop: 10,
+    // marginTop: 10,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
+    textAlign: 'center',
   },
   textInput: {
     backgroundColor: '#fff',
-    marginHorizontal: 20,
     fontSize: 18,
     paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderColor: '#aaa',
+    borderColor: '#000',
     borderRadius: 10,
     borderWidth: 1,
-    marginBottom: 5,
-    width: 225,
+    // marginBottom: 20,
+    textAlign: 'center',
   },
 });

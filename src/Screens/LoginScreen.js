@@ -20,6 +20,7 @@ import {loginUser,updateProfileUser} from '../redux/actions/user'
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [text, onChangeText] = useState('');
+  const [messageErr, setMessageErr] = useState('');
   const dispatch = useDispatch();
   const loading = useSelector(state => state.user.loading)
   return (
@@ -37,18 +38,27 @@ const LoginScreen = () => {
         </Text>
         <TextInput
           style={styles.input}
-          onChangeText={onChangeText}
+          onChangeText={text=>{
+              onChangeText(text);
+              setMessageErr('');
+          }}
           value={text}
         />
+         <Text style={{color: 'red',position: 'absolute',bottom:10,left:0,right:0,textAlign:'center'}}>{messageErr}</Text>
       </View>
+      
       <TouchableOpacity
         disabled={loading?true:false}
         style={styles.buttonLogin}
         onPress={()=>{
-            if(text.trim()!=='')
+            if(text.trim().length>5)
             {
                 dispatch(loginUser(text));
             }
+            else
+              {
+                  setMessageErr('Password must be at least 6 characters');
+              }
                 
         }}
         >
@@ -81,8 +91,8 @@ const styles = StyleSheet.create({
   formInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    marginVertical:20,
+    paddingVertical: 40,
+    // marginVertical:40,
   },
   input: {
     backgroundColor: 'white',

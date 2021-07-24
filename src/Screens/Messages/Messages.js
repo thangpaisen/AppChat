@@ -5,19 +5,25 @@ import {
   Send,
   SystemMessage,
   Composer,
-  Actions
+  Actions,
 } from 'react-native-gifted-chat';
 import * as Types from '../../../code';
 import Icon from 'react-native-vector-icons/Ionicons';
+import NetInfo from '@react-native-community/netinfo';
 import {
   StyleSheet,
   Text,
   View,
   Pressable,
   TouchableOpacity,
-  BackHandler
+  BackHandler,
+  Image,
+  Dimensions 
 } from 'react-native';
+import Lightbox from 'react-native-lightbox';
 import Header from './Header';
+import NetworkError from '../NetworkError';
+
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
@@ -29,31 +35,38 @@ import {logoutUser} from '../../redux/actions/user';
 const Messages = ({route}) => {
   const {thread} = route.params;
   const user = auth().currentUser.toJSON();
-  const [text, setText] = useState('')
+  const [text, setText] = useState('');
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [netStatus, setNetStatus] = useState(true);
+  const [imageSize, setImageSize] = useState({
+
+  })
+  useEffect(() => {
+    NetInfo.addEventListener(state => {
+      setNetStatus(state.isConnected);
+    });
+  });
   const backAction = () => {
-    console.log('out')
-      firestore()
+    console.log('out');
+    firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .collection('MESSAGES')
-      .add(
-        {
-           text:`${user.displayName} đã rời khỏi nhóm!!!`,
-           system: true,
-            createdAt: new Date().getTime(),
-        },
-      );
+      .add({
+        text: `${user.displayName} đã rời khỏi nhóm!!!`,
+        system: true,
+        createdAt: new Date().getTime(),
+      });
     firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .set(
         {
           latestMessage: {
-            text:`${user.displayName} đã rời khỏi nhóm!!!`,
+            text: `${user.displayName} đã rời khỏi nhóm!!!`,
             createdAt: new Date().getTime(),
-            name:'Hệ Thống'
+            name: 'Hệ Thống',
           },
         },
         {merge: true},
@@ -120,7 +133,8 @@ const Messages = ({route}) => {
           latestMessage: {
             name: user.displayName,
             text,
-            image:'',
+            image: '',
+            sizeImage:{},
             createdAt: new Date().getTime(),
           },
         },
@@ -133,13 +147,17 @@ const Messages = ({route}) => {
       {merge: true},
     );
   };
-  const handleSendImage = async (uri) => {
+  const handleSendImage = async (uri,height,width) => {
     firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .collection('MESSAGES')
       .add({
-        image:uri,
+        image: uri,
+        sizeImage:{
+          width, 
+          height
+        },
         createdAt: new Date().getTime(),
         user: {
           _id: user.uid,
@@ -153,8 +171,12 @@ const Messages = ({route}) => {
         {
           latestMessage: {
             name: user.displayName,
-            image:uri,
-            text:'',
+            image: uri,
+            sizeImage:{
+              width, 
+              height
+            },
+            text: '',
             createdAt: new Date().getTime(),
           },
         },
@@ -168,13 +190,11 @@ const Messages = ({route}) => {
     );
   };
   const renderBubble = props => {
-    if(props.currentMessage.user._id === user.uid){
-       return <Bubble {...props} />;
+    if (props.currentMessage.user._id === user.uid) {
+      return <Bubble {...props} />;
     }
     if (props.previousMessage.user) {
-      if (
-        props.currentMessage.user._id === props.previousMessage.user._id
-      ) {
+      if (props.currentMessage.user._id === props.previousMessage.user._id) {
         return <Bubble {...props} />;
       }
     }
@@ -211,14 +231,14 @@ const Messages = ({route}) => {
         }}
         textStyle={{
           fontSize: 14,
-          color: 'gray'
+          color: 'gray',
         }}
       />
     );
   };
   const onInputTextChanged = async value => {
     let typingTmp;
-    if (value === '') typingTmp= false;
+    if (value === '') typingTmp = false;
     else typingTmp = true;
     await firestore().collection('MESSAGE_THREADS').doc(thread._id).set(
       {
@@ -228,139 +248,157 @@ const Messages = ({route}) => {
     );
     setIsTyping(typingTmp);
   };
-  const scrollToBottomComponent =(props) => {
-      return (
-        <View style={styles.scrollToBottomContainer}>
-             <Icon name="caret-down-outline" size={24} color="black" />
-        </View>
+  const scrollToBottomComponent = props => {
+    return (
+      <View style={styles.scrollToBottomContainer}>
+        <Icon name="caret-down-outline" size={24} color="black" />
+      </View>
     );
-  }
-  const renderComposer = (props)=>{
-      return(
+  };
+  const renderComposer = props => {
+    return (
       <Composer
-      {...props}
-      textInputStyle={styles.composer}
-      placeholder='Nhập tin nhắn...'
-      //  onTextChanged={(text) => setText(text)}
-      // text={text}
-      // multiline={true} 
+        {...props}
+        textInputStyle={styles.composer}
+        placeholder="Nhập tin nhắn..."
+        //  onTextChanged={(text) => setText(text)}
+        // text={text}
+        // multiline={true}
       ></Composer>
-    )
-  }
+    );
+  };
   const openLibrary = () => {
-
     launchImageLibrary(
       {
         mediaType: 'photo',
         includeBase64: false,
-        // maxHeight: 200,
-        // maxWidth: 200,
       },
-     response => {
+      response => {
         if (!response.didCancel) {
-          const uri = response.assets[0].uri;
-          const fileName = response.assets[0].fileName;
-          upLoadedImageToFirebase(uri,fileName);
+          const {uri,fileName,height,width} = response.assets[0];
+          upLoadedImageToFirebase(uri,fileName,height,width);
         } else console.log('exit ');
       },
     );
-  }
+  };
   const openCamera = () => {
-      launchCamera(
-        {
-          mediaType: 'photo',
-          includeBase64: false,
-          // maxHeight: 200,
-          // maxWidth: 200,
-        },
-        response => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+      },
+      response => {
         if (!response.didCancel) {
-            const uri = response.assets[0].uri;
-            const fileName = response.assets[0].fileName;
-            upLoadedImageToFirebase(uri,fileName);
-          } else console.log('exit ');
-        },
-      );
-  }
-  const  renderActions=(props) =>{
+          const {uri,fileName,height,width} = response.assets[0];
+          upLoadedImageToFirebase(uri,fileName,height,width);
+        } else console.log('exit ');
+      },
+    );
+  };
+  const renderActions = props => {
     return (
       <Actions
         {...props}
         options={{
-          ['Camera']: () =>openCamera(),
-          ['Library']: () =>openLibrary(),
+          ['Camera']: () => openCamera(),
+          ['Library']: () => openLibrary(),
         }}
         // onSend={args => console.log('args')}
         icon={() => (
-          <View style={{marginTop:-2}}>
-          <Icon name="image-outline" size={24} color="black" />
+          <View style={{marginTop: -2}}>
+            <Icon name="image-outline" size={24} color="black" />
           </View>
         )}
       />
-    )
-  }
-  const renderMessageImage= (props) =>{
-  }
-  const upLoadedImageToFirebase = async (uri, fileName) => {
-      const reference = storage().ref(fileName);
-      await reference.putFile(uri);
-      const url = await storage().ref(fileName).getDownloadURL();
-      console.log(url);
-      handleSendImage(url);
+    );
   };
+
+  const upLoadedImageToFirebase = async (uri, fileName,height,width) => {
+    const reference = storage().ref(fileName);
+    await reference.putFile(uri);
+    const url = await storage().ref(fileName).getDownloadURL();
+    // console.log(url);
+    handleSendImage(url,height,width);
+  };
+  const renderMessageImage = props => {
+    let {height, width} = props.currentMessage.sizeImage;
+    console.log(height,width);
+
+    return(
+      <View style={{backgroundColor:'transparent'}}>
+          <Lightbox
+            activeProps={{
+              style: {flex: 1,resizeMode: 'contain'},
+            }}
+            >
+              <Image
+                // style={[{resizeMode:'stretch',width:windowWidth*0.5,height:windowWidth*0.5}]}
+                style={[{resizeMode:'stretch',width:windowWidth/2,height:windowWidth/2 /(width/height)}]}
+                source={{ uri: props.currentMessage.image }}
+              />
+            </Lightbox>
+        </View>
+    )
+  };
+ 
   return (
     <View style={styles.container}>
-      <Header thread={thread}/>
-      <GiftedChat
-        listViewProps={{
-          showsVerticalScrollIndicator: false,
-          marginBottom:10,
-        }}
-        // showUserAvatar={true}
-        // renderUsernameOnMessage={true} // hiện thị username ở dưới mỗi ti nhắn (0 cần có tùy chỉnh username ở renderBubble rồi)
-        // renderAvatarOnTop={true} // hiển thị avatar đầu tin nhắn mặc đỉnh ở cuối
-        onInputTextChanged={onInputTextChanged} // Gọi lại khi văn bản đầu vào thay đổi
-        scrollToBottom //hiện cái button cuộn xuống dưới cùng
-        scrollToBottomComponent={scrollToBottomComponent} //tinh chỉnh cái scrollToBottom
-        renderSend={renderSend} //tùy chỉnh cái nút send
-        renderActions={renderActions}  //Nút hành động tùy chỉnh ở bên trái của trình soạn tin nhắn
-        // onInputTextChanged={}   //khi InputText thay đổi thì làm j
-        isTyping={isTyping} // ...
-        renderComposer={renderComposer}   // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
-        renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
-        // renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh
-        alwaysShowSend   //Luôn hiển thị nút gửi trong trình soạn văn bản đầu vào
-        messages={messages}
-        onSend={handleSend}
-        renderBubble={renderBubble}
-        user={{
-          _id: user.uid,
-        }}
-      />
+      <Header thread={thread} />
+      {!netStatus ? (
+        <NetworkError />
+      ) : (
+        <GiftedChat
+          listViewProps={{
+            showsVerticalScrollIndicator: false,
+            marginBottom: 10,
+          }}
+          // showUserAvatar={true}
+          // renderUsernameOnMessage={true} // hiện thị username ở dưới mỗi ti nhắn (0 cần có tùy chỉnh username ở renderBubble rồi)
+          // renderAvatarOnTop={true} // hiển thị avatar đầu tin nhắn mặc đỉnh ở cuối
+          onInputTextChanged={onInputTextChanged} // Gọi lại khi văn bản đầu vào thay đổi
+          scrollToBottom //hiện cái button cuộn xuống dưới cùng
+          scrollToBottomComponent={scrollToBottomComponent} //tinh chỉnh cái scrollToBottom
+          renderSend={renderSend} //tùy chỉnh cái nút send
+          renderActions={renderActions} //Nút hành động tùy chỉnh ở bên trái của trình soạn tin nhắn
+          // onInputTextChanged={}   //khi InputText thay đổi thì làm j
+          isTyping={isTyping} // ...
+          renderComposer={renderComposer} // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
+          renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
+          renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh
+          alwaysShowSend //Luôn hiển thị nút gửi trong trình soạn văn bản đầu vào
+          messages={messages}
+          onSend={handleSend}
+          renderBubble={renderBubble}
+          user={{
+            _id: user.uid,
+          }}
+        />
+      )}
     </View>
   );
 };
 
 export default Messages;
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'pink',
   },
-  scrollToBottomContainer:{
+  scrollToBottomContainer: {
     // backgroundColor: 'white',
     // elevation:1,
   },
-  composer:{
-      backgroundColor:'white',
-      color:'black',
-      fontSize:16,
-      // borderRadius:15,
-      // borderColor:'#C0CCDA',
-      // borderWidth:1,
-      marginTop:2,
-      marginBottom:2,
-      // paddingLeft: 10,
-    },
+  composer: {
+    backgroundColor: 'white',
+    color: 'black',
+    fontSize: 16,
+    // borderRadius:15,
+    // borderColor:'#C0CCDA',
+    // borderWidth:1,
+    marginTop: 2,
+    marginBottom: 2,
+    // paddingLeft: 10,
+  },
 });
