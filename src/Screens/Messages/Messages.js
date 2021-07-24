@@ -20,7 +20,8 @@ import {
   Image,
   Dimensions 
 } from 'react-native';
-import Lightbox from 'react-native-lightbox';
+// import Lightbox from 'react-native-lightbox';
+import Lightbox from 'react-native-lightbox-v2';
 import Header from './Header';
 import NetworkError from '../NetworkError';
 
@@ -39,13 +40,11 @@ const Messages = ({route}) => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [netStatus, setNetStatus] = useState(true);
-  const [imageSize, setImageSize] = useState({
-
-  })
   useEffect(() => {
-    NetInfo.addEventListener(state => {
+    const unsubscribe= NetInfo.addEventListener(state => {
       setNetStatus(state.isConnected);
     });
+    return () =>unsubscribe();
   });
   const backAction = () => {
     console.log('out');
@@ -110,7 +109,6 @@ const Messages = ({route}) => {
       // backAction();
     };
   }, []);
-
   const handleSend = async (messages = []) => {
     const text = messages[0].text;
     firestore()
@@ -322,18 +320,17 @@ const Messages = ({route}) => {
   };
   const renderMessageImage = props => {
     let {height, width} = props.currentMessage.sizeImage;
-    console.log(height,width);
-
     return(
-      <View style={{backgroundColor:'transparent'}}>
+      <View 
+        style={{backgroundColor:'transparent'}}
+        >
           <Lightbox
             activeProps={{
               style: {flex: 1,resizeMode: 'contain'},
             }}
             >
               <Image
-                // style={[{resizeMode:'stretch',width:windowWidth*0.5,height:windowWidth*0.5}]}
-                style={[{resizeMode:'stretch',width:windowWidth/2,height:windowWidth/2 /(width/height)}]}
+                style={[{resizeMode:'stretch',width:windowWidth/2,height:windowWidth/2 /(width/height),borderRadius:10}]}
                 source={{ uri: props.currentMessage.image }}
               />
             </Lightbox>

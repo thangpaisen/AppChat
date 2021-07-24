@@ -25,8 +25,7 @@ const RoomItem = ({item}) => {
           <Text style={item.latestMessage.name===Types.NAME_ADMIN? {color:'red'}:{color: '#0c7feb'}}>
             {item.latestMessage.name || 'Hệ Thống'}:{' '}
           </Text>
-          {item.latestMessage.text.slice(0, 90)}
-          {/* {item.latestMessage.createdAt} */}
+              {item.latestMessage.image.length>0?'send to Image...':item.latestMessage.text.slice(0, 90)}
         </Text>
       </View>
     </View>

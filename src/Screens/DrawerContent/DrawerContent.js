@@ -6,14 +6,16 @@ import {
   View,
   ImageBackground,
   Dimensions,
+  Linking,
+  Share,
 } from 'react-native';
-import * as Types from '../../../code'
+import * as Types from '../../../code';
 import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Ionicons';
 // import imageBackgroundUser from '../../assets/image/dollars_logo.png';
 // import imageBackgroundUser2 from '../../assets/image/image2.png';
 import {useNavigation} from '@react-navigation/native';
-import {useDispatch,useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {logoutUser} from '../../redux/actions/user';
 const DrawerContent = props => {
   const navigation = useNavigation();
@@ -21,7 +23,9 @@ const DrawerContent = props => {
   const user = useSelector(state => state.user.data);
   return (
     <View style={styles.container}>
-      <DrawerContentScrollView contentContainerStyle={{paddingTop: 0}}>
+      <DrawerContentScrollView
+        contentContainerStyle={{paddingTop: 0}}
+        showsVerticalScrollIndicator={false}>
         <View style={styles.drawerContent}>
           <View style={styles.userInfoSection}>
             <Avatar
@@ -31,15 +35,13 @@ const DrawerContent = props => {
               }}
               size={90}
             />
-              <Text style={styles.title}> {user.displayName}</Text>
-              <Text style={{fontSize: 16, color: 'gray'}}>
-                Chức vụ: Thủ lĩnh🦾
-              </Text>
+            <Text style={styles.title}> {user.displayName}</Text>
+            <Text style={{fontSize: 14, color: 'gray'}}>Chức vụ: Trùm🦾</Text>
           </View>
           <View style={styles.drawerSection}>
             <DrawerItem
-            // focused={true}
-            // activeTintColor={'red'}
+              // focused={true}
+              // activeTintColor={'red'}
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
               icon={({color, size}) => (
                 <Icon name="chatbox-outline" color={color} size={size} />
@@ -53,40 +55,52 @@ const DrawerContent = props => {
                 navigation.navigate('ChatRoom');
               }}
             />
-            {
-              user.displayName ===Types.NAME_ADMIN
-            &&<DrawerItem
+            {user.displayName === Types.NAME_ADMIN && (
+              <DrawerItem
+                style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
+                icon={({color, size}) => (
+                  <Icon name="add-circle-outline" color={color} size={size} />
+                )}
+                label={({focused, color}) => (
+                  <Text
+                    style={{color: '#555', fontSize: 16, fontWeight: 'bold'}}>
+                    Tạo phòng chat
+                  </Text>
+                )}
+                onPress={() => {
+                  navigation.navigate('CreateChatRoom');
+                }}
+              />
+            )}
+            <DrawerItem
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
-
               icon={({color, size}) => (
-                <Icon name="add-circle-outline" color={color} size={size} />
+                <Icon name="exit-outline" color={color} size={size} />
               )}
               label={({focused, color}) => (
                 <Text style={{color: '#555', fontSize: 16, fontWeight: 'bold'}}>
-                  Tạo phòng chat
+                  Đăng xuất
                 </Text>
               )}
-              onPress={() => {
-                navigation.navigate('CreateChatRoom');
-              }}
+              onPress={() => dispatch(logoutUser())}
             />
-            }
-            <DrawerItem
-          icon={({color, size}) => (
-            <Icon name="exit-outline" color={color} size={size} />
-          )}
-          label={({focused, color}) => (
-            <Text style={{color: '#555', fontSize: 16, fontWeight: 'bold'}}>
-              Đăng xuất
-            </Text>
-          )}
-          onPress={() =>  dispatch(logoutUser())}
-        />
           </View>
         </View>
       </DrawerContentScrollView>
+
       <View style={styles.bottomDrawerSection}>
-            <DrawerItem
+        <View style={styles.welcome}>
+          <Text
+            style={{
+              color: '#555',
+              fontSize: 30,
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>
+            Welcome to Dollars
+          </Text>
+        </View>
+        <DrawerItem
           icon={({color, size}) => (
             <Icon name="help-circle-outline" color={color} size={size} />
           )}
@@ -95,16 +109,22 @@ const DrawerContent = props => {
               Help and Feedback
             </Text>
           )}
+          onPress={() => Linking.openURL('mailto:thangpaisen@gmail.com')}
         />
         <DrawerItem
           icon={({color, size}) => (
-            <Icon name="exit-outline" color={color} size={size} />
+            <Icon name="share-social-outline" color={color} size={size} />
           )}
           label={({focused, color}) => (
             <Text style={{color: '#555', fontSize: 16, fontWeight: 'bold'}}>
               Share
             </Text>
           )}
+          onPress={() =>
+            Share.share({
+              message: 'DownLoad and experience App on ....',
+            })
+          }
         />
       </View>
     </View>
@@ -141,6 +161,11 @@ const styles = StyleSheet.create({
     // marginTop: 15,
     // backgroundColor: 'red'
   },
+  welcome: 
+  {
+    // backgroundColor:'red',
+    padding: 20, borderBottomColor: '#f4f4f4', borderBottomWidth: 1
+    },
   bottomDrawerSection: {
     marginTop: 15,
     borderTopColor: '#f4f4f4',
