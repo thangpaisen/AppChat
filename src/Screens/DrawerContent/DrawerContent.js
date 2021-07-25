@@ -40,8 +40,6 @@ const DrawerContent = props => {
           </View>
           <View style={styles.drawerSection}>
             <DrawerItem
-              // focused={true}
-              // activeTintColor={'red'}
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
               icon={({color, size}) => (
                 <Icon name="chatbox-outline" color={color} size={size} />
@@ -55,7 +53,6 @@ const DrawerContent = props => {
                 navigation.navigate('ChatRoom');
               }}
             />
-            {user.displayName === Types.NAME_ADMIN && (
               <DrawerItem
                 style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
                 icon={({color, size}) => (
@@ -71,7 +68,6 @@ const DrawerContent = props => {
                   navigation.navigate('CreateChatRoom');
                 }}
               />
-            )}
             <DrawerItem
               style={{borderTopColor: '#f4f4f4', borderTopWidth: 1}}
               icon={({color, size}) => (

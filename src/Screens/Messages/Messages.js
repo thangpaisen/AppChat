@@ -20,7 +20,9 @@ import {
   Image,
   Dimensions 
 } from 'react-native';
-// import Lightbox from 'react-native-lightbox';
+import Video from 'react-native-video';
+import VideoPlayer from 'react-native-video-controls';
+// import VideoPlayer from 'react-native-video-player';
 import Lightbox from 'react-native-lightbox-v2';
 import Header from './Header';
 import NetworkError from '../NetworkError';
@@ -337,7 +339,17 @@ const Messages = ({route}) => {
         </View>
     )
   };
- 
+ const renderMessageVideo=(props)=> {
+    return 
+    <View style={{ height: 150, width: 250 ,resizeMode:'cover'}}>
+          <VideoPlayer
+          source={{ uri:props.currentMessage.video }}
+          disableBack
+          disableFullscreen
+          disableVolume
+        />
+    </View>
+}
   return (
     <View style={styles.container}>
       <Header thread={thread} />
@@ -357,11 +369,11 @@ const Messages = ({route}) => {
           scrollToBottomComponent={scrollToBottomComponent} //tinh chỉnh cái scrollToBottom
           renderSend={renderSend} //tùy chỉnh cái nút send
           renderActions={renderActions} //Nút hành động tùy chỉnh ở bên trái của trình soạn tin nhắn
-          // onInputTextChanged={}   //khi InputText thay đổi thì làm j
           isTyping={isTyping} // ...
           renderComposer={renderComposer} // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
           renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
           renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh
+          renderMessageVideo={renderMessageVideo} //Video tin nhắn tùy chỉnh
           alwaysShowSend //Luôn hiển thị nút gửi trong trình soạn văn bản đầu vào
           messages={messages}
           onSend={handleSend}
@@ -384,18 +396,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
   },
   scrollToBottomContainer: {
-    // backgroundColor: 'white',
-    // elevation:1,
   },
   composer: {
     backgroundColor: 'white',
     color: 'black',
     fontSize: 16,
-    // borderRadius:15,
-    // borderColor:'#C0CCDA',
-    // borderWidth:1,
     marginTop: 2,
     marginBottom: 2,
-    // paddingLeft: 10,
   },
 });
