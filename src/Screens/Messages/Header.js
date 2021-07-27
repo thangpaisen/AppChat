@@ -1,10 +1,40 @@
 import React from 'react'
-import { StyleSheet, Text, View,Pressable,BackHandler } from 'react-native'
+import { StyleSheet, Text, View,Pressable,BackHandler,Alert } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
-const Header = ({thread}) => {
+import {useSelector} from 'react-redux'
+import {checkNameAdmin} from '../../util/checkNameAdmin'
+const Header = ({thread,listUserVip}) => {
+  const nameUser = useSelector(state => state.user.data.displayName);
+  const user = useSelector(state => state.user.data);
+  console.log(nameUser);
+  console.log(user);
   const navigation = useNavigation();
+    const createTwoButtonAlert = () =>
+      Alert.alert(
+        "Cảnh báo",
+        "Bạn muốn xóa Room chat này",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+          },
+          { text: "OK", onPress: () => deleteRoomChat() }
+        ]
+    );
+    const deleteRoomChat= ()=>{
+        console.log("deleteRoomChat",thread)
+        firestore()
+          .collection('MESSAGE_THREADS')
+          .doc(thread._id)
+          .delete()
+          .then(() => {
+             navigation.navigate('ChatRoom'); 
+              Alert.alert("Thông báo",`Room "${thread.name}" đã bị xóa...`)}
+              );     
+    }
     return (
         <View style={styles.header}>
         <Pressable
@@ -23,7 +53,15 @@ const Header = ({thread}) => {
             {thread.name}
           </Text>
         </View>
-        <View style={[styles.back, {backgroundColor: 'transparent'}]}></View>
+          {nameUser==="Admin"?
+          <Pressable
+          onPress={() => {
+            createTwoButtonAlert();
+          }}>
+          <Icon name="trash" size={24} color="black" />
+        </Pressable>
+          :<View style={[styles.back, {backgroundColor: 'transparent'}]}></View>}
+          
       </View>
     )
 }
@@ -48,7 +86,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textHeader: {
-    marginLeft: 10,
     fontSize: 18,
     color: 'white',
     fontWeight: 'bold',

@@ -7,13 +7,16 @@ import {
   View,
   Pressable,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  Image
 } from 'react-native';
 import Header from './Header'
+import imgLoading from '../../assets/image/loading1.gif';
 import NetInfo from "@react-native-community/netinfo";
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore'
 import NetworkError from '../NetworkError'
+
 const imageRoom =[
   'https://avatarfiles.alphacoders.com/194/thumb-194775.png',
   'https://avatarfiles.alphacoders.com/893/thumb-89303.gif',
@@ -44,7 +47,7 @@ export default function CreateChatRoom() {
   const navigation = useNavigation();
   const [roomName, setRoomName] = useState('');
   const [messageErr, setMessageErr] = useState('');
-  const [loadingCreateRoom, setLoadingCreateRoom] = useState(true)
+  const [loadingCreateRoom, setLoadingCreateRoom] = useState(false)
   const [netStatus, setNetStatus] = useState(true);
   useEffect(() => {
       NetInfo.addEventListener(state => {
@@ -74,8 +77,11 @@ export default function CreateChatRoom() {
             createdAt: new Date().getTime(),
             system: true
           })
+          console.log('created ok')
           navigation.navigate('ChatRoom')
           setLoadingCreateRoom(false)
+          setRoomName('');
+
         })
       } catch (error) {
           console.log(error);
@@ -94,16 +100,22 @@ export default function CreateChatRoom() {
         !netStatus?<NetworkError/>
       :<View style={styles.main}>
         <TextInput
+          editable={loadingCreateRoom?false:true}
           style={styles.textInput}
           placeholder="Nhập tên phòng..."
           onChangeText={roomName => {
             setRoomName(roomName);
-            setMessageErr('')
+            setMessageErr('');
           }}
+          value={roomName}
         />
          <Text style={{color: 'red',textAlign:'center',padding:6}}>{messageErr}</Text>
-        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
-          <Text style={styles.buttonText}>Tạo Phòng chat</Text>
+        <TouchableOpacity 
+          disabled={loadingCreateRoom?true:false}
+          style={styles.button} 
+          onPress={handleButtonPress}>
+        {!loadingCreateRoom?<Text style={styles.buttonText}>Tạo Phòng chat</Text>
+        :<Image source={imgLoading} style={{width:32,height:32,resizeMode:'stretch'}}/>}
         </TouchableOpacity>
       </View>
       }
@@ -133,12 +145,14 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#2196F3',
-    textAlign: 'center',
-    paddingVertical: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 5,
     borderRadius: 5,
     // marginTop: 10,
   },
   buttonText: {
+    padding:5,
     color: '#fff',
     fontSize: 18,
     textAlign: 'center',
@@ -150,7 +164,8 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     borderRadius: 10,
     borderWidth: 1,
+    paddingLeft:20,
     // marginBottom: 20,
-    textAlign: 'center',
+    // textAlign: 'center',
   },
 });

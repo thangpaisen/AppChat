@@ -31,7 +31,7 @@ const DrawerContent = props => {
             <Avatar
               rounded
               source={{
-                uri: 'https://avatarfiles.alphacoders.com/890/thumb-89095.gif',
+                uri: user.photoURL || 'https://avatarfiles.alphacoders.com/962/thumb-96289.gif',
               }}
               size={90}
             />

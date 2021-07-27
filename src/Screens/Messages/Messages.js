@@ -6,7 +6,9 @@ import {
   SystemMessage,
   Composer,
   Actions,
+  
 } from 'react-native-gifted-chat';
+import { Avatar } from 'react-native-elements';
 import * as Types from '../../../code';
 import {checkNameAdmin} from '../../util/checkNameAdmin'
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -105,7 +107,8 @@ const Messages = ({route}) => {
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .onSnapshot(querySnapshot => {
-        setIsTyping(querySnapshot.data().typing);
+        if(querySnapshot.data())
+          setIsTyping(querySnapshot.data().typing);
       });
       const unsubscribeListener3=  firestore()
       .collection('USER_VIP')
@@ -126,7 +129,9 @@ const Messages = ({route}) => {
   }, []);
   const handleSend = async (messages = []) => {
     const text = messages[0].text;
-    firestore()
+    if(text.trim().length>0)
+      {
+        firestore()
       .collection('MESSAGE_THREADS')
       .doc(thread._id)
       .collection('MESSAGES')
@@ -159,6 +164,7 @@ const Messages = ({route}) => {
       },
       {merge: true},
     );
+      }
   };
   const handleSendImage = async (uri,height,width) => {
     firestore()
@@ -352,6 +358,21 @@ const Messages = ({route}) => {
         </View>
     )
   };
+  const renderAvatar = props => {
+    console.log(props.currentMessage.user.avatar)
+    // console.log(props)
+    return(
+      <Avatar
+        rounded
+        // title={props.currentMessage.user.displayName}
+        source={{
+          uri:
+            props.currentMessage.user.avatar||'https://images6.alphacoders.com/102/1029037.jpg',
+        }}
+        size={37}
+      />
+    )
+  };
  const renderMessageVideo=(props)=> {
     return 
     <View style={{ height: 150, width: 250 ,resizeMode:'cover'}}>
@@ -365,7 +386,7 @@ const Messages = ({route}) => {
 }
   return (
     <View style={styles.container}>
-      <Header thread={thread} />
+      <Header thread={thread} listUserVip={listUserVip} />
       {!netStatus ? (
         <NetworkError />
       ) : (
@@ -383,6 +404,7 @@ const Messages = ({route}) => {
           renderSend={renderSend} //tùy chỉnh cái nút send
           renderActions={renderActions} //Nút hành động tùy chỉnh ở bên trái của trình soạn tin nhắn
           isTyping={isTyping} // ...
+          // renderAvatar={renderAvatar}
           renderComposer={renderComposer} // Trình soạn tin nhắn đầu vào văn bản tùy chỉnh
           renderSystemMessage={renderSystemMessage} //Thông báo hệ thống tùy chỉnh
           renderMessageImage={renderMessageImage} //Hình ảnh tin nhắn tùy chỉnh

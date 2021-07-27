@@ -51,6 +51,7 @@ export const logoutUser = () => async dispatch => {
 
 export const updateProfileUser = name => async dispatch => {
     var nameNew=name;
+    var photoURL='';
     var listUserVip=[];
     const snapshot = await firestore().collection('USER_VIP').get();
     snapshot.forEach((doc) => {
@@ -67,6 +68,7 @@ export const updateProfileUser = name => async dispatch => {
         else if(name===item.CodeLogin)
             {
               nameNew=item.UserName;
+              photoURL=item.photoURL||'';
               return false;
             }
         return true;
@@ -75,6 +77,7 @@ export const updateProfileUser = name => async dispatch => {
     await auth()
       .currentUser.updateProfile({
         displayName: nameNew,
+        photoURL:photoURL,
       })
       .then(() => {
         const user = auth().currentUser;
