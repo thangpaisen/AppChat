@@ -11,7 +11,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {logoutUser} from '../../redux/actions/user';
-const Header = () => {
+const Header = ({threads}) => {
+  // console.log('threads1',threads);
   const navigation = useNavigation();
   const dispatch = useDispatch();
     return (
@@ -27,15 +28,12 @@ const Header = () => {
             Clan Dollars
           </Text>
         </View>
-        {/* <Pressable
+        <TouchableOpacity
           onPress={() => {
-            dispatch(logoutUser());
+            navigation.navigate('SearchRoom',{threads:threads,})
           }}>
-          <Icon name="log-out-outline" size={24} color="white" />
-        </Pressable> */}
-        <View>
-          <Icon name="log-out-outline" size={24} color="transparent" />
-        </View>
+          <Icon name="search-outline" size={24} color="white" />
+        </TouchableOpacity>
       </View>
       
     )

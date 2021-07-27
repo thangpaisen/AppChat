@@ -10,7 +10,8 @@ const Header = ({thread}) => {
         <Pressable
           style={styles.back}
           onPress={() => {
-            navigation.navigate('ChatRoom')   
+            // navigation.navigate('ChatRoom')   
+            navigation.goBack(); 
           }}>
           <Icon name="arrow-back-outline" size={24} color="white" />
         </Pressable>

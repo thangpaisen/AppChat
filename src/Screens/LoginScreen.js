@@ -51,15 +51,14 @@ const LoginScreen = () => {
         disabled={loading?true:false}
         style={styles.buttonLogin}
         onPress={()=>{
-            if(text.trim().length>5)
+            if(text.trim().length>4 &&text.trim().length<31)
             {
                 dispatch(loginUser(text));
             }
+            else if(text.trim().length>30)
+              setMessageErr('Password at most 30 characters');
             else
-              {
-                  setMessageErr('Password must be at least 6 characters');
-              }
-                
+              setMessageErr('Password must be at least 5 characters')        
         }}
         >
         {

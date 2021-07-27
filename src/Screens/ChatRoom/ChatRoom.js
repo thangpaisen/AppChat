@@ -55,36 +55,11 @@ const ChatRoom = () => {
     };
   }, []);
   const handleOnPressItem = item => {
-    //  firestore()
-    //     .collection('MESSAGE_THREADS')
-    //     .doc(item._id)
-    //     .collection('MESSAGES')
-    //     .add(
-    //       {
-    //          text:`${user.displayName} đã vào nhóm!!!`,
-    //          system: true,
-    //         createdAt: new Date().getTime(),
-    //       },
-    //     );
-    //   firestore()
-    //     .collection('MESSAGE_THREADS')
-    //     .doc(item._id)
-    //     .set(
-    //       {
-    //         latestMessage: {
-    //           text:`${user.displayName} đã vào nhóm!!!`,
-    //           createdAt: new Date().getTime(),
-    //           name:'Hệ Thống'
-    //         },
-    //       },
-    //       {merge: true},
-    //     );
     navigation.navigate('Messages', {thread: item});
   };
-
   return (
     <View style={styles.container}>
-      <Header />
+      <Header threads={threads} />
       {!netStatus ? (
         <NetworkError />
       ) : (

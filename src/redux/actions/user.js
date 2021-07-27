@@ -1,4 +1,5 @@
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import * as Types from '../../../code'
 export const loginUserLoading = () => {
   return {
@@ -25,8 +26,8 @@ export const loginUser = name => async dispatch => {
     await auth()
       .signInAnonymously()
       .then(() => {
-        dispatch(loginUserSuccess());
         dispatch(updateProfileUser(name));
+        dispatch(loginUserSuccess());
       });
   } catch (e) {
     dispatch(loginUserSuccess());
@@ -49,25 +50,33 @@ export const logoutUser = () => async dispatch => {
 };
 
 export const updateProfileUser = name => async dispatch => {
-  // console.log('PASSWORD_ADMIN',Types.PASSWORD_ADMIN);
-  var nameNew ;
-  if(name.toUpperCase().includes('ADMIN')|| name.toUpperCase()==='ADMIN' || name.toUpperCase()==='AD' || name.toUpperCase()==='BOSS')
-    nameNew= `${name}[Fake]`
-  else
-  {
-    if(name===Types.PASSWORD_ADMIN)
-      nameNew='Admin'
-    else
-    nameNew=name;
-  }
-    
+    var nameNew=name;
+    var listUserVip=[];
+    const snapshot = await firestore().collection('USER_VIP').get();
+    snapshot.forEach((doc) => {
+        // console.log(doc.id, '=>', doc.data());
+          const firebaseData = doc.data();
+          listUserVip.push(firebaseData);
+      });
+    listUserVip.every(item => {
+        if(name.replace(/ /g, "").toUpperCase() === item.UserName.toUpperCase())
+            {
+              nameNew=`${name}[Fake]`;
+              return false;
+            }
+        else if(name===item.CodeLogin)
+            {
+              nameNew=item.UserName;
+              return false;
+            }
+        return true;
+    })
   try {
     await auth()
       .currentUser.updateProfile({
         displayName: nameNew,
       })
       .then(() => {
-        // console.log('updateProfileUserOK');
         const user = auth().currentUser;
         dispatch(setUser(user));
       });

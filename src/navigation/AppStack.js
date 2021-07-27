@@ -6,6 +6,7 @@ import ChatRoom from '../Screens/ChatRoom';
 import CreateChatRoom from '../Screens/CreateChatRoom';
 import Messages from '../Screens/Messages';
 import DrawerContent from '../Screens/DrawerContent';
+import SearchRoom from '../Screens/SearchRoom';
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const AppStack = () => {
@@ -29,6 +30,7 @@ const MenuDrawer = () => {
       >
       <Drawer.Screen name="ChatRoom" component={ChatRoom} />
       <Drawer.Screen name="CreateChatRoom" component={CreateChatRoom} />
+      <Drawer.Screen name="SearchRoom" component={SearchRoom} />
     </Drawer.Navigator>
   );
 }

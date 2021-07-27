@@ -43,7 +43,7 @@ const  getRandomImg=()=> {
 export default function CreateChatRoom() {
   const navigation = useNavigation();
   const [roomName, setRoomName] = useState('');
-  const [messageErr, setMessageErr] = useState('fasdfafwdaf');
+  const [messageErr, setMessageErr] = useState('');
   const [loadingCreateRoom, setLoadingCreateRoom] = useState(true)
   const [netStatus, setNetStatus] = useState(true);
   useEffect(() => {

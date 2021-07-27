@@ -8,6 +8,7 @@ import {
   Actions,
 } from 'react-native-gifted-chat';
 import * as Types from '../../../code';
+import {checkNameAdmin} from '../../util/checkNameAdmin'
 import Icon from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 import {
@@ -42,6 +43,7 @@ const Messages = ({route}) => {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [netStatus, setNetStatus] = useState(true);
+  const [listUserVip, setListUserVip] = useState([]);
   useEffect(() => {
     const unsubscribe= NetInfo.addEventListener(state => {
       setNetStatus(state.isConnected);
@@ -79,7 +81,7 @@ const Messages = ({route}) => {
       .doc(thread._id)
       .collection('MESSAGES')
       .orderBy('createdAt', 'desc')
-      .onSnapshot(querySnapshot => {
+      .onSnapshot(querySnapshot => {                                                                      
         const messages = querySnapshot.docs.map(doc => {
           const firebaseData = doc.data();
           const data = {
@@ -105,9 +107,20 @@ const Messages = ({route}) => {
       .onSnapshot(querySnapshot => {
         setIsTyping(querySnapshot.data().typing);
       });
+      const unsubscribeListener3=  firestore()
+      .collection('USER_VIP')
+      .onSnapshot(querySnapshot => {
+        const listUserVip = querySnapshot.docs.map(doc => {
+          return  {
+            ...doc.data(),
+          };
+        });
+        setListUserVip(listUserVip);
+      });
     return () => {
       unsubscribeListener();
       unsubscribeListener2();
+      unsubscribeListener3();
       // backAction();
     };
   }, []);
@@ -189,7 +202,7 @@ const Messages = ({route}) => {
       {merge: true},
     );
   };
-  const renderBubble = props => {
+  const renderBubble =  (props) => {
     if (props.currentMessage.user._id === user.uid) {
       return <Bubble {...props} />;
     }
@@ -198,9 +211,10 @@ const Messages = ({route}) => {
         return <Bubble {...props} />;
       }
     }
+    var kq = checkNameAdmin(listUserVip,props.currentMessage.user.name);
     return (
       <View>
-        {props.currentMessage.user.name === Types.NAME_ADMIN ? (
+        {kq? (
           <Text style={{fontSize: 12, color: 'red', left: 5}}>
             {props.currentMessage.user.name}
           </Text>
@@ -312,7 +326,6 @@ const Messages = ({route}) => {
       />
     );
   };
-
   const upLoadedImageToFirebase = async (uri, fileName,height,width) => {
     const reference = storage().ref(fileName);
     await reference.putFile(uri);
